@@ -12,10 +12,9 @@ void read_mtx(const std::string &filename, int &n, std::vector<int> &Ap, std::ve
 
     std::string line;
 
-    // Skip comments
     while (std::getline(file, line)) {
-        if (line[0] == '%') continue; // Skip comments
-        break; // First non-comment line contains dimensions
+        if (line[0] == '%') continue; 
+        break; 
     }
 
     std::istringstream iss(line);
@@ -42,8 +41,8 @@ void read_mtx(const std::string &filename, int &n, std::vector<int> &Ap, std::ve
             std::cerr << "Error parsing line: " << line << std::endl;
             continue;
         }
-        row--; // Convert to 0-based index
-        col--; // Convert to 0-based index
+        row--; 
+        col--; 
         if (row < 0 || row >= rows || col < 0 || col >= cols) {
             std::cerr << "Index out of bounds: row = " << row << ", col = " << col << std::endl;
             continue;
@@ -59,8 +58,7 @@ void read_mtx(const std::string &filename, int &n, std::vector<int> &Ap, std::ve
         }
     }
 
-    // Debugging output
-    std::cout << "Matrix loaded with " << rows << " rows, " << cols << " columns, and " << nonzeros << " nonzeros.\n";
+    // std::cout << "Matrix loaded with " << rows << " rows, " << cols << " columns, and " << nonzeros << " nonzeros.\n";
     // std::cout << "Ap: ";
     // for (int i = 0; i < Ap.size(); ++i) std::cout << Ap[i] << " ";
     // std::cout << "\nAi: ";
