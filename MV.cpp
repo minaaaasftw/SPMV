@@ -139,8 +139,6 @@ void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
 }
 
 
-
-
  void spmv_csc_parallel(int n, const int *Ap, const int *Ai, const double *Ax,
                         const double *x, double *y) {
 #pragma omp parallel for default(shared) schedule(auto)
@@ -151,8 +149,6 @@ void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
    }
   }
  }
-
-
 
  void spmv_csc_lbc(int n_parts, const int *sets, const int *ids,
                    int n, const int *Ap,
@@ -168,6 +164,7 @@ void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
     }
    }
   }
+  #pragma omp parallel for
   for (int m = 0; m < n_parts; ++m) {
    for (int i = 0; i < n; ++i) {
     y[i] += red_tmp[m*n + i];
@@ -203,16 +200,16 @@ void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
  }
 
 
- void spmv_csc_block(int n, const int *Ap, const int *Ai, const double *Ax,
+void spmv_csc_block(int n, const int *Ap, const int *Ai, const double *Ax,
                 const double *x, double *y, int nodes,
                 const int *supernodes) {
 
-//#pragma omp parallel for default(shared) schedule(auto)
+#pragma omp parallel for default(shared) schedule(auto)
   for (int i = 0; i < nodes; i++) {
    for (int j = supernodes[i]; j < supernodes[i + 1]; j++) {
     for (int k = Ap[j]; k < Ap[j + 1]; k++) {
 
-//#pragma omp atomic
+#pragma omp atomic
      y[Ai[k]] += Ax[k] * x[j];
     }
    }
