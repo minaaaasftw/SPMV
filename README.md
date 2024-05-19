@@ -63,4 +63,15 @@ The table below illustrates the performance improvements observed after parallel
 
 
 
+## Visual Results
+
+The following images illustrate the performance improvements of the SPMV functions after parallelization.
+
+### Performance Plot
+
+![Performance Plot](download.png)
+
+### Another Visualization
+
+![Performance Plot without spmv_csr_scaled ](download1.png)
 
