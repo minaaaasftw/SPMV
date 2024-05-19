@@ -72,46 +72,73 @@ void spmv_csr_block(int n, const int *Ap, const int *Ai, const double *Ax,
  }
 
 
-
-
-
-
- void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
-               const double *x, double *y) {
-  int i, j;
-  for (i = 0; i < n; i++) {
-   for (j = Ap[i]; j < Ap[i + 1]; j++) {
-    y[Ai[j]] += Ax[j] * x[i];
-   }
-  }
- }
-
+void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
+              const double *x, double *y) {
+#pragma omp parallel for
+    for (int k = 0; k < n; k++) {
+        y[k] = 0.0;
+    }
+#pragma omp parallel for schedule(dynamic, 10)
+    for (int i = 0; i < n; i++) {
+        for (int j = Ap[i]; j < Ap[i + 1]; j++) {
+#pragma omp atomic
+            y[Ai[j]] += Ax[j] * x[i];
+        }
+    }
+}
 
 
  void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
                const double *x, const double *y, double *z, double a,
                double b) {
-  for (int i = 0; i < n; i++) {
-   for (int j = Ap[i]; j < Ap[i + 1]; j++) {
-    z[Ai[j]] += Ax[j] * x[i];
-   }
-  }
-  for (int i = 0; i < n; i++)
-   z[i] = a * z[i] + b * y[i];
- }
-
+#pragma omp parallel for
+    for (int i = 0; i < n; i++) {
+        z[i] = 0.0;
+    }
+#pragma omp parallel for schedule(dynamic, 10)
+    for (int i = 0; i < n; i++) {
+        for (int j = Ap[i]; j < Ap[i + 1]; j++) {
+#pragma omp atomic
+            z[Ai[j]] += Ax[j] * x[i];
+        }
+    }
+#pragma omp parallel for
+    for (int i = 0; i < n; i++) {
+        z[i] = a * z[i] + b * y[i];
+    }
+}
+ 
  void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
-               const double *x, const double *y, double *z, double *a,
+               const double *x, const double *y, double *z, double* a,
                double *b) {
-  for (int i = 0; i < n; i++) {
-   for (int j = Ap[i]; j < Ap[i + 1]; j++) {
-    z[Ai[j]] += Ax[j] * x[i];
-   }
-  }
-#pragma omp parallel for schedule(auto)
-  for (int i = 0; i < n; i++)
-   z[i] = a[i] * z[i] + b[i] * y[i];
- }
+ #pragma omp parallel for
+    for (int i = 0; i < n; i++) {
+        z[i] = 0.0;
+    }
+#pragma omp parallel
+    {
+        std::vector<double> local_z(n, 0.0); 
+
+#pragma omp for schedule(dynamic, 10)
+        for (int i = 0; i < n; i++) {
+            for (int j = Ap[i]; j < Ap[i + 1]; j++) {
+                local_z[Ai[j]] += Ax[j] * x[i];
+            }
+        }
+#pragma omp critical
+        {
+            for (int i = 0; i < n; i++) {
+                z[i] += local_z[i];
+            }
+        }
+    }
+#pragma omp parallel for schedule(static)
+    for (int i = 0; i < n; i++) {
+        z[i] = a[i] * z[i] + b[i] * y[i];
+    }
+}
+
+
 
 
  void spmv_csc_parallel(int n, const int *Ap, const int *Ai, const double *Ax,
