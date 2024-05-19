@@ -10,11 +10,11 @@ This repository contains various implementations of Sparse Matrix-Vector Multipl
 
 ### spmv_csr_scaled
 - **First Version**: SPMV with CSR format, including scaling operations.
-- **Modified Version**: Improved with parallelism to enhance performance.
+- **Modified Version**: Optimized with parallelization to reduce execution time.
 
 ### spmv_csr_parallel
 - **First Version**: An initial attempt to parallelize the CSR format SPMV.
-- **Modified Version**: Further optimized for better performance.
+- **Modified Version**: Optimized with parallelization to reduce execution time.
 
 ### csr_block
 - **First Version**: CSR format SPMV with block processing.
@@ -22,19 +22,19 @@ This repository contains various implementations of Sparse Matrix-Vector Multipl
 
 ### spmv_csc
 - **First Version**: SPMV using Compressed Sparse Column (CSC) format.
-- **Modified Version**: Enhanced with parallelization for faster execution.
+- **Modified Version**: Optimized with parallelization to reduce execution time.
 
 ### spmv_csc_scaled
 - **First Version**: CSC format SPMV with scaling operations.
-- **Modified Version**: Optimized for better performance using parallel processing.
+- **Modified Version**: Optimized with parallelization to reduce execution time.
 
 ### lbc_csc
 - **First Version**: Load-balanced chunk CSC format SPMV.
-- **Modified Version**: Further optimized for reduced execution time.
+- **Modified Version**: Optimized with parallelization to reduce execution time.
 
 ### csc_block
 - **First Version**: CSC format SPMV with block processing.
-- **Modified Version**: Improved through parallelization to decrease runtime.
+- **Modified Version**: Optimized with parallelization to reduce execution time.
 
 ## How to Run
 
