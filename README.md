@@ -71,7 +71,7 @@ The following images illustrate the performance improvements of the SPMV functio
 
 ![Performance Plot](download.png)
 
-### Another Visualization
+### Another Visualization without spmv_csr_scaled
 
-![Performance Plot without spmv_csr_scaled ](without_scale.png)
+![Performance Plot without spmv_csr_scaled](without_scale.png)
 
