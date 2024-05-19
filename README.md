@@ -43,3 +43,21 @@ To compile and run the files, use the following commands:
 ```sh
 clang++ -fopenmp -std=c++11 -Iinclude main.cpp MV.cpp readmatrixcsc.cpp readmtx.cpp -o spmv
 ./spmv
+
+## Performance Improvements
+
+The table below illustrates the performance improvements observed after parallelizing the various SPMV functions.
+
+| Function           | First Version (seconds) | Modified Version (seconds) |
+|--------------------|--------------------------|-----------------------------|
+| spmv_csr           | 0.00748587               | 0.0025351                   |
+| spmv_csr_scaled    | 0.153944                 | 0.00175905                  |
+| spmv_csr_parallel  | 0.0035405                | 0.002196                    |
+| csr_block          | 0.0017719                | 0.0016719                   |
+| spmv_csc           | 0.0045669                | 0.003937                    |
+| spmv_csc_scaled    | 0.00500393               | 0.0036962                   |
+| lbc_csc            | 0.00282079               | 0.0024000                   |
+| csc_block          | 0.00444007               | 0.00313282                  |
+
+
+
