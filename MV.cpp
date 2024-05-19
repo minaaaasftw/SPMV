@@ -203,17 +203,29 @@ void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
 void spmv_csc_block(int n, const int *Ap, const int *Ai, const double *Ax,
                 const double *x, double *y, int nodes,
                 const int *supernodes) {
-
-#pragma omp parallel for default(shared) schedule(auto)
-  for (int i = 0; i < nodes; i++) {
-   for (int j = supernodes[i]; j < supernodes[i + 1]; j++) {
-    for (int k = Ap[j]; k < Ap[j + 1]; k++) {
-
-#pragma omp atomic
-     y[Ai[k]] += Ax[k] * x[j];
+#pragma omp parallel for
+    for (int i = 0; i < n; i++) {
+        y[i] = 0.0;
     }
-   }
-  }
+#pragma omp parallel
+    {
+        std::vector<double> local_y(n, 0.0);
+
+#pragma omp for schedule(dynamic, 1)
+        for (int i = 0; i < nodes; i++) {
+            for (int j = supernodes[i]; j < supernodes[i + 1]; j++) {
+                for (int k = Ap[j]; k < Ap[j + 1]; k++) {
+                    local_y[Ai[k]] += Ax[k] * x[j];
+                }
+            }
+        }
+#pragma omp critical
+        {
+            for (int i = 0; i < n; i++) {
+                y[i] += local_y[i];
+            }
+        }
+    }
  }
 
     /// multiplies a diagonal matrix with a vector

@@ -11,10 +11,7 @@ int main() {
     
     int n;
     double r;
-    int n_parts = 10;
-    std::vector<int> sets(n_parts + 1);
-    std::vector<int> ids(n);
-    std::vector<int> Ap(n + 1);
+    std::vector<int> Ap(n);
     std::vector<int> Ai;
     std::vector<double> Ax;
     std::vector<double> x(n, 1.0);
@@ -22,24 +19,17 @@ int main() {
 
     read_mtx(filename,n,n, Ap, Ai, Ax);
         
-    for (int i = 0; i < n; ++i) {
-        r = ((double) rand() / (RAND_MAX));
-        x[i] = r;  
+    int supernode_size = 100; 
+    int nodes = supernode_size - 1;
+    std::vector<int> supernodes(nodes + 1);
+    for (int i = 0; i <= nodes; i++) {
+        supernodes[i] = i * supernode_size;
     }
+    supernodes[nodes] = n;
 
-    for (int i = 0; i <= n_parts; i++) {
-        sets[i] = i * (n / n_parts);
-    }
-    sets[n_parts] = n;
-
-    for (int i = 0; i < n; i++) {
-        ids[i] = i;
-    }
-
-double Stime = omp_get_wtime();
-   sym_lib::spmv_csc_lbc(n_parts, sets.data(), ids.data(), n, Ap.data(), Ai.data(), Ax.data(), x.data(), y.data());
-
-    std:: cout <<"time taken by csc is :"<< omp_get_wtime()-Stime;
+   double Stime = omp_get_wtime();
+   sym_lib::spmv_csc_block(n, Ap.data(), Ai.data(), Ax.data(), x.data(), y.data(), nodes, supernodes.data());
+   std:: cout <<"time taken by csc block is :"<< omp_get_wtime()-Stime;
 
     return 0;
  }
