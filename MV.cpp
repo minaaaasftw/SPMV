@@ -1,7 +1,3 @@
-//
-// Created by kazem on 10/9/19.
-//
-
 #ifdef ENABLE_OPENMP
  #include <omp.h>
 #endif
@@ -9,52 +5,47 @@
 
 namespace sym_lib {
 
- void spmv_csr(const int n, const int *Ap, const int *Ai, const double *Ax,
-               const double *x, double *y) {
-  int i, j;
-  for (i = 0; i < n; i++) {
-   y[i]=0;
-   for (j = Ap[i]; j < Ap[i + 1]; j++) {
-    y[i] += Ax[j] * x[Ai[j]];
-   }
+void spmv_csr(const int n, const int *Ap, const int *Ai, const double *Ax, const double *x, double *y) {
+      #pragma omp parallel for
+      for (int i = 0; i < n; i++) {
+          double sum = 0.0;
+          int row_start = Ap[i];
+          int row_end = Ap[i + 1];
+          for (int j = row_start; j < row_end; j++) {
+              sum += Ax[j] * x[Ai[j]];
+          }
+          y[i] = sum;
+      }
   }
- }
 
- void spmv_csr(int n, const int *Ap, const int *Ai, const double *Ax,
-               const double *x, const double *y, double *z, double a,
-               double b) {
-  int i, j;
-#pragma omp parallel for default(shared) schedule(auto)
-  for (i = 0; i < n; i++) {
-   for (j = Ap[i]; j < Ap[i + 1]; j++) {
-    z[i] += Ax[j] * x[Ai[j]];
-   }
-   z[i] = a * z[i] + b * y[i];
-  }
- }
+void spmv_csr(int n, const int *Ap, const int *Ai, const double *Ax,
+              const double *x, const double *y, double *z, double a, double b) {
+    #pragma omp parallel for schedule(dynamic,1)
+    for (int i = 0; i < n; i++) {
+        double sum = 0.0;
+        for (int j = Ap[i]; j < Ap[i + 1]; j++) {
+            sum += Ax[j] * x[Ai[j]];
+        }
+        z[i] = a * sum + b * y[i];
+    }
+}
 
-#define Prof11
+
 void spmv_csr_parallel(int n, const int *Ap, const int *Ai, const double *Ax,
-                        const double *x, double *y) {
+                       const double *x, double *y) {
 #pragma omp parallel
   {
-#ifdef Prof1
-   double wtime = omp_get_wtime();
-#endif
-#pragma omp for schedule(static) nowait
-  for (int i = 0; i < n; i++) {
-   y[i]=0;
-   for (int j = Ap[i]; j < Ap[i + 1]; j++) {
-    y[i] += Ax[j] * x[Ai[j]];
-   }
+#pragma omp for schedule(dynamic, 10) nowait
+    for (int i = 0; i < n; i++) {
+      double sum = 0.0;
+      for (int j = Ap[i]; j < Ap[i + 1]; j++) {
+        sum += Ax[j] * x[Ai[j]];
+      }
+      y[i] = sum;
+    }
   }
-#ifdef Prof1
-   wtime = omp_get_wtime() - wtime;
-      printf( "Time taken by thread %d is %f\n", omp_get_thread_num(), wtime );
-#endif
-  }
- // std::cout<<"\n";
- }
+}
+
 
 void spmv_csr_block(int n, const int *Ap, const int *Ai, const double *Ax,
                      int nodes, const int *supernodes, const double *x,
