@@ -46,22 +46,20 @@ void spmv_csr_parallel(int n, const int *Ap, const int *Ai, const double *Ax,
   }
 }
 
-
 void spmv_csr_block(int n, const int *Ap, const int *Ai, const double *Ax,
                      int nodes, const int *supernodes, const double *x,
                      double *y) {
 #pragma omp parallel for default(shared) schedule(auto)
-  for (int i = 0; i < nodes; i++) {
-   for (int j = supernodes[i]; j < supernodes[i + 1]; j++) {
-    y[j] = 0;
-    for (int k = Ap[j]; k < Ap[j + 1]; k++) {
-     y[j] += Ax[k] * x[Ai[k]];
+    for (int i = 0; i < nodes; i++) {
+        for (int j = supernodes[i]; j < supernodes[i + 1]; j++) {
+            double sum = 0.0; 
+            for (int k = Ap[j]; k < Ap[j + 1]; k++) {
+                sum += Ax[k] * x[Ai[k]];
+            }
+            y[j] = sum; 
+        }
     }
-   }
-  }
- }
-
-
+}
 
  void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
                const double *x, double *y) {
@@ -72,7 +70,6 @@ void spmv_csr_block(int n, const int *Ap, const int *Ai, const double *Ax,
    }
   }
  }
-
 
 
  void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
