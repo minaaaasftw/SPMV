@@ -73,6 +73,9 @@ void spmv_csr_block(int n, const int *Ap, const int *Ai, const double *Ax,
 
 
 
+
+
+
  void spmv_csc(int n, const int *Ap, const int *Ai, const double *Ax,
                const double *x, double *y) {
   int i, j;
@@ -109,6 +112,7 @@ void spmv_csr_block(int n, const int *Ap, const int *Ai, const double *Ax,
   for (int i = 0; i < n; i++)
    z[i] = a[i] * z[i] + b[i] * y[i];
  }
+
 
  void spmv_csc_parallel(int n, const int *Ap, const int *Ai, const double *Ax,
                         const double *x, double *y) {
